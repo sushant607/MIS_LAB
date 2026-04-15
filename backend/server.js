@@ -14,19 +14,41 @@ const documentRoutes = require('./routes/documents');
 
 const app = express();
 
-// --- Core Middleware ---
-app.use(helmet());
+const allowedOrigins = [
+  "http://localhost:8080",
+  "http://localhost:8081",
+  process.env.FRONTEND_ORIGIN,
+  process.env.FRONTEND_ORIGIN_2,
+].filter(Boolean);
 
-app.use(cors({
-  origin: process.env.FRONTEND_ORIGIN || 'http://localhost:8080',
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser clients (no Origin header) and configured browser origins.
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+// --- Core Middleware ---
+app.use(helmet()); // Basic security headers
+app.use(cors({
+  origin: process.env.FRONTEND_ORIGIN || 'http://localhost:8080' || 'http://localhost:8081', // Your frontend URL
+  credentials: true, // Important for sending cookies with requests
 }));
+app.use(express.json()); // For parsing application/json
+app.use(cookieParser()); // For parsing cookies, used by auth middleware
 
 app.use(express.json());
 app.use(cookieParser());
 
 // --- API Routes ---
 
+// Public routes (authentication)
 app.use('/api/auth', require('./routes/auth'));
 
 app.use('/api/tickets', authenticate, require('./routes/authTickets'));

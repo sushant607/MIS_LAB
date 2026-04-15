@@ -222,7 +222,39 @@ npm run dev          # Start development server
 npm run build        # Build for production  
 npm run preview      # Preview production build
 npm run lint         # Run ESLint
+npm run test:selenium:new-ticket   # Run employee login + new-ticket Selenium flow
 ```
+
+## 🧪 Selenium E2E (Single Feature)
+
+Implemented test flow:
+- Employee login
+- Click New Ticket
+- Create a ticket with department set to Network team
+- No attachment upload
+
+Test file:
+- `selenium-tests/new-ticket-flow.mjs`
+
+Run steps:
+1. Start backend API on `http://localhost:5000`
+2. Start frontend (default expected by test: `http://localhost:8081`)
+3. Run:
+
+```bash
+npm run test:selenium:new-ticket
+```
+
+Optional environment overrides:
+
+```bash
+SELENIUM_BASE_URL=http://localhost:8081
+SELENIUM_LOGIN_EMAIL=sushant_network@gmail.com
+SELENIUM_LOGIN_PASSWORD=123@Password
+SELENIUM_ACTION_DELAY_MS=700
+```
+
+Increase `SELENIUM_ACTION_DELAY_MS` (for example `1500`) to slow down every interaction.
 
 ## 🎯 Future Enhancements
 
